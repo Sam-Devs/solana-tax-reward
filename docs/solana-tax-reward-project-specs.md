@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project implements a Solana smart contract (program) for an SPL token that applies a 5% tax on both buy and sell transactions. Unlike the previous plan, all collected taxes are fully swapped into SOL and immediately redistributed as rewards proportionally to all token holders without delay. This ensures a complete "2/2" reward sharing cycle that is both transparent and efficient.
+This project implements a Solana smart contract (program) for an SPL token that applies a 5% tax on both buy and sell transactions. All collected taxes are fully swapped into SOL and immediately redistributed as rewards proportionally to all token holders without delay to ensure a complete "2/2" reward sharing cycle that is both transparent and efficient.
 
 ## Project Structure
 
