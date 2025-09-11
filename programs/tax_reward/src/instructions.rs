@@ -13,7 +13,7 @@ pub struct Initialize<'info> {
     #[account(
         init,
         payer = authority,
-        space = Config::LEN,
+        space = Config::LEN + 8,
         seeds = [b"config", program_id.as_ref(), mint.key().as_ref()],
         bump
     )]
@@ -30,18 +30,25 @@ pub struct Initialize<'info> {
         init,
         payer = authority,
         token::mint = mint,
-        token::authority = program_id,
+        token::authority = vault_authority,
         seeds = [b"token_vault", program_id.as_ref(), mint.key().as_ref()],
         bump
     )]
     pub token_vault: Account<'info, TokenAccount>,
+    /// CHECK: PDA used as token vault authority
+    #[account(
+        seeds = [b"vault_authority", program_id.as_ref(), mint.key().as_ref()],
+        bump
+    )]
+    pub vault_authority: AccountInfo<'info>,
     #[account(
         init,
         payer = authority,
+        space = 0,
         seeds = [b"reward_vault", program_id.as_ref(), mint.key().as_ref()],
         bump
     )]
-    /// CHECK: SOL vault for reward distribution
+    /// CHECK: SOL vault for reward distribution, initialized as system account
     pub reward_vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
@@ -54,18 +61,23 @@ pub struct TaxedSwap<'info> {
     pub config: Account<'info, Config>,
     #[account(mut, seeds = [b"global", program_id.as_ref(), mint.key().as_ref()], bump)]
     pub global_state: Account<'info, GlobalState>,
-    #[account(mut, seeds = [b"token_vault", program_id.as_ref(), mint.key().as_ref()], bump)]
+    #[account(mut, seeds = [b"token_vault", program_id.as_ref(), mint.key().as_ref()], bump, token::authority = vault_authority)]
     pub token_vault: Account<'info, TokenAccount>,
+    /// CHECK: PDA used as token vault authority
+    #[account(
+        seeds = [b"vault_authority", program_id.as_ref(), mint.key().as_ref()],
+        bump
+    )]
+    pub vault_authority: AccountInfo<'info>,
     #[account(mut, seeds = [b"reward_vault", program_id.as_ref(), mint.key().as_ref()], bump)]
     /// CHECK: SOL vault for distribution
     pub reward_vault: AccountInfo<'info>,
     #[account(
-        mut,
-        seeds = [b"user", program_id.as_ref(), user_wallet.key().as_ref(), mint.key().as_ref()],
-        bump,
         init_if_needed,
         payer = user_wallet,
-        space = UserInfo::LEN
+        space = UserInfo::LEN + 8,
+        seeds = [b"user", program_id.as_ref(), user_wallet.key().as_ref(), mint.key().as_ref()],
+        bump
     )]
     pub user_info: Account<'info, UserInfo>,
     #[account(mut)]
@@ -79,6 +91,8 @@ pub struct TaxedSwap<'info> {
 
 #[derive(Accounts)]
 pub struct Claim<'info> {
+    #[account(seeds = [b"config", program_id.as_ref(), mint.key().as_ref()], bump)]
+    pub config: Account<'info, Config>,
     #[account(mut, seeds = [b"global", program_id.as_ref(), mint.key().as_ref()], bump)]
     pub global_state: Account<'info, GlobalState>,
     #[account(mut, seeds = [b"reward_vault", program_id.as_ref(), mint.key().as_ref()], bump)]
@@ -103,10 +117,27 @@ pub struct UpdateConfig<'info> {
         has_one = owner
     )]
     pub config: Account<'info, Config>,
-    /// CHECK: authority must match config.owner
-    #[account(signer)]
-    pub authority: AccountInfo<'info>,
     pub mint: Account<'info, Mint>,
+    pub owner: Signer<'info>,
+}
+
+
+#[derive(Accounts)]
+pub struct UpdateTotalSupply<'info> {
+    #[account(
+        seeds = [b"config", program_id.as_ref(), mint.key().as_ref()],
+        bump,
+        has_one = owner
+    )]
+    pub config: Account<'info, Config>,
+    #[account(
+        mut,
+        seeds = [b"global", program_id.as_ref(), mint.key().as_ref()],
+        bump
+    )]
+    pub global_state: Account<'info, GlobalState>,
+    pub mint: Account<'info, Mint>,
+    pub owner: Signer<'info>,
 }
 
 #[derive(Accounts)]
