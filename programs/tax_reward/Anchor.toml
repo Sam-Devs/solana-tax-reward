@@ -1,6 +1,7 @@
-# Uncomment and set your deployed program ID after first deploy:
-# [programs.localnet]
-# solana_tax_reward = "<YourProgramIDHere>"
+# Uncomment and set your deployed program ID and upgrade authority after first deploy:
+[programs.localnet]
+solana_tax_reward = "2A1sUwgtyMHswvfY2N4UTZLyPKLNjEHmhRzYFZgQgHQF"
+upgrade_authority = "2A1sUwgtyMHswvfY2N4UTZLyPKLNjEHmhRzYFZgQgHQF"
 
 [provider]
 cluster = "localnet"

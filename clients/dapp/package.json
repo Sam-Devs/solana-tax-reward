@@ -6,9 +6,13 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "echo 'No front-end tests configured yet'",
+    "e2e:test": "cypress run --config baseUrl=http://localhost:3000"
   },
   "dependencies": {
+    "prom-client": "^14.0.0",
+    "dd-trace": "^1.0.0",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@shadcn/ui": "^0.0.4",
     "@tanstack/react-query": "^5.84.1",
@@ -23,6 +27,8 @@
     "zustand": "^5.0.7"
   },
   "devDependencies": {
+    "@types/cypress": "^12.17.0",
+    "cypress": "^12.17.0",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
