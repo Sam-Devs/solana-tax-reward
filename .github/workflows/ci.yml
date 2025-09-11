@@ -1,0 +1,170 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Rust fmt check
+        run: cargo fmt -- --check
+      - name: Clippy
+        run: cargo clippy --all -- -D warnings
+
+  rust-tests:
+    runs-on: ubuntu-latest
+    needs: format-check
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Anchor CLI
+        run: |
+          cargo install --locked anchor-cli --force
+      - name: Run Anchor tests
+        run: |
+          anchor test --skip-deploy
+
+  proptest:
+    runs-on: ubuntu-latest
+    needs: rust-tests
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run property tests
+        run: cargo test -- --ignored
+
+  js-tests:
+    runs-on: ubuntu-latest
+    needs: format-check
+    strategy:
+      matrix:
+        dir: [clients/dapp, clients/batch-service]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        working-directory: ${{ matrix.dir }}
+        run: npm install
+      - name: Lint
+        working-directory: ${{ matrix.dir }}
+        run: npm run lint
+      - name: Test
+        working-directory: ${{ matrix.dir }}
+        run: npm test
+
+  security:
+    runs-on: ubuntu-latest
+    needs: rust-tests
+    steps:
+      - uses: actions/checkout@v3
+      - name: Security scan
+        id: security-scan
+        run: |
+          mantaray scan --fail-on-critical
+          oxygen audit --fail-on-critical
+      - name: Create remediation issue
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: "Security Findings - remediation required",
+              body: "CI detected critical/high severity security findings. Please address and reference this issue for remediation."
+            })
+mainnet-fork:
+    runs-on: ubuntu-latest
+    needs: rust-tests
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.solana.com/v1.14.17/install)"
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+      - name: Start test validator fork
+        run: solana-test-validator --fork ${{ secrets.SOLANA_RPC_URL }} --reset &
+      - name: Build & deploy program
+        run: |
+          anchor build
+          anchor deploy --provider.cluster localnet
+      - name: Run Anchor tests on fork
+        run: anchor test
+# E2E and Load/Upgrade Test Jobs
+  e2e-dapp:
+    runs-on: ubuntu-latest
+    needs: js-tests
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install & Start dApp
+        working-directory: clients/dapp
+        run: |
+          npm ci
+          npm run dev &
+      - name: Wait for dApp to be ready
+        run: npx wait-on http://localhost:3000
+      - name: Run Cypress E2E tests
+        working-directory: clients/dapp
+        run: npm run e2e:test
+
+  e2e-batch:
+    runs-on: ubuntu-latest
+    needs: js-tests
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        working-directory: clients/batch-service
+        run: npm ci
+      - name: Start batch-service
+        working-directory: clients/batch-service
+        run: npm start &
+      - name: Wait for batch-service to be ready
+        run: npx wait-on http://localhost:4000
+      - name: Run batch-service E2E tests
+        working-directory: clients/batch-service
+        run: npm run e2e:test
+
+  load-tests:
+    runs-on: ubuntu-latest
+    needs: [e2e-dapp, e2e-batch]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install load test tool
+        run: sudo apt-get update && sudo apt-get install -y wrk
+      - name: Run load test against swap endpoint
+        run: wrk -t2 -c100 -d30s http://localhost:3000/api/swap
+
+  upgrade-tests:
+    runs-on: ubuntu-latest
+    needs: rust-tests
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.solana.com/v1.14.17/install)"
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+      - name: Anchor build & deploy original program
+        run: |
+          anchor build
+          anchor deploy --provider.cluster localnet
+      - name: Run baseline tests on localnet
+        run: anchor test -- --ignored
+      - name: Anchor upgrade to new version
+        run: anchor upgrade ./target/deploy/solana_tax_reward.so --provider.cluster localnet
+      - name: Run post-upgrade tests
+        run: anchor test

@@ -1,0 +1,188 @@
+# Rust
+/target/
+/Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# Anchor
+.anchor/
+test-ledger/
+.DS_Store
+
+# IDL
+target/idl/
+target/types/
+
+# Keypairs (SECURITY: Never commit private keys!)
+**/keypairs/
+**/*-keypair.json
+**/*.json
+!package*.json
+!tsconfig*.json
+!cypress.json
+!next.config*.json
+!jest.config*.json
+
+# Solana
+test-ledger/
+.config/
+
+# Node.js (for client applications)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.npm
+.yarn-integrity
+*.tgz
+*.tar.gz
+
+# Client build artifacts
+clients/*/dist/
+clients/*/build/
+clients/*/.next/
+clients/*/.nuxt/
+clients/*/out/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.vim/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.DocumentRevisions-V100
+.TemporaryItems
+.Apdisk
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage reports
+coverage/
+*.lcov
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# OS generated files
+.DS_Store?
+ehthumbs.db
+Thumbs.db
+
+# Editor backups and swap files
+*~
+.*.swp
+.*.swo
+
+# Rust analyzer
+rust-project.json
+
+# Testing
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# Local Netlify folder
+.netlify
+
+# Anchor.toml backup files
+Anchor.toml.backup
+
+# SBP build artifacts
+*.so
+
+# Program deploy artifacts
+program-keypair.json
+deploy-key.json
+
+# Local validator artifacts
+test-ledger/
+ledger/
+
+# Solana CLI config
+.config/solana/
+target/

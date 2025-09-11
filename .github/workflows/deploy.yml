@@ -1,0 +1,49 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-program:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Rust and Anchor
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source $HOME/.cargo/env
+          cargo install --locked anchor-cli --force
+
+      - name: Setup Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.solana.com/v1.14.17/install)"
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+
+      - name: Deploy program on mainnet
+        env:
+          SOLANA_WALLET: ${{ secrets.SOLANA_WALLET }}
+        run: bash scripts/deploy/deploy.sh mainnet "$SOLANA_WALLET"
+
+  redeploy-clients:
+    runs-on: ubuntu-latest
+    needs: deploy-program
+    strategy:
+      matrix:
+        app: [clients/dapp, clients/batch-service]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Dependencies
+        working-directory: ${{ matrix.app }}
+        run: npm install
+      - name: Build
+        working-directory: ${{ matrix.app }}
+        run: npm run build
+      - name: Start
+        working-directory: ${{ matrix.app }}
+        run: npm run start
