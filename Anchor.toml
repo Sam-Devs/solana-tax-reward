@@ -1,0 +1,13 @@
+[workspace]
+members = ["programs/tax_reward"]
+
+# Uncomment and set your deployed program ID after first deploy:
+# [programs.localnet]
+# solana_tax_reward = "<YourProgramIDHere>"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "anchor test --skip-deploy"
