@@ -4,13 +4,21 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-solana-program = "1.14.17"
-anchor-lang = "0.27.0"
-anchor-spl = "0.27.0"
-thiserror = "1.0"
-borsh = "0.9.3"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+anchor-lang = { version = "0.27.0", features = ["init-if-needed"] }
+anchor-spl = { version = "0.27.0", features = ["default"] }
+spl-token = { version = "3.5.0", features = ["no-entrypoint"] }
+# Force compatible versions to resolve dependency conflicts
+solana-zk-token-sdk = "=1.14.17"
+spl-token-2022 = { version = "0.6.0", features = ["no-entrypoint"] }
+
+[features]
+default = ["mock-swaps"]
+mock-swaps = []  # Use mock swap implementation for development
+jupiter-swaps = []  # Enable Jupiter DEX integration
+serum-swaps = []  # Enable Serum DEX integration
+
+[dev-dependencies]
+proptest = "1.0"
 
 [lib]
 crate-type = ["cdylib", "lib"]
