@@ -70,7 +70,7 @@ fn mock_swap_for_development(
     token_amount: u64,
     min_amount_out: u64,
 ) -> ProgramResult {
-    msg!("🚧 MOCK SWAP: Converting {} tokens to ~{} SOL (for development)", token_amount, min_amount_out);
+    msg!(" MOCK SWAP: Converting {} tokens to ~{} SOL (for development)", token_amount, min_amount_out);
     
     // In a real implementation, this would:
     // 1. Transfer tokens from token_vault to DEX
@@ -96,7 +96,7 @@ fn jupiter_swap_with_vault_authority(
     token_amount: u64,
     min_amount_out: u64,
 ) -> ProgramResult {
-    msg!("🚧 Jupiter integration template - not yet implemented");
+    msg!("Jupiter integration template - not yet implemented");
     
     // Step 1: Validate accounts
     // - Ensure token_vault has sufficient balance

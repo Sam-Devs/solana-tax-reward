@@ -7,8 +7,8 @@ set -euo pipefail
 RPC_URL=${1:-"http://127.0.0.1:8899"}
 PORT=${2:-9100}
 
-echo "🔍 Starting Solana Prometheus exporter..."
+echo "Starting Solana Prometheus exporter..."
 solana-prom --rpc-url "$RPC_URL" --metrics-port "$PORT" &
 
-echo "✅ Prometheus exporter running on port $PORT."
-echo "🚨 Configure Prometheus and Alertmanager to scrape metrics and alert on high slippage or failed swaps."
+echo "Prometheus exporter running on port $PORT."
+echo "Configure Prometheus and Alertmanager to scrape metrics and alert on high slippage or failed swaps."
