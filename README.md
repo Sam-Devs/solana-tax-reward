@@ -5,7 +5,7 @@
 [![Anchor Version](https://img.shields.io/badge/anchor-0.27.0-purple.svg)](https://anchor-lang.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A comprehensive Solana-based DeFi system that implements a **tax-and-reward mechanism** for SPL token trades. The system automatically taxes token swaps, converts collected tokens to SOL via DEX integration, and redistributes rewards to token holders proportionally.
+A Solana-based DeFi system that implements a **tax-and-reward mechanism** for SPL token trades. The system automatically taxes token swaps, converts collected tokens to SOL via DEX integration, and redistributes rewards to token holders proportionally. It is a side project I work on at leisure time and still under development.
 
 ## Key Features
 
@@ -248,7 +248,7 @@ We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 - Testing requirements
 - Pull request process
 
-## 📚 Documentation
+## Documentation
 
 - [**Architecture Guide**](./docs/ARCHITECTURE.md) - System design and components
 - [**Operational Runbook**](./docs/OPERATIONAL_RUNBOOK.md) - Deployment and maintenance
